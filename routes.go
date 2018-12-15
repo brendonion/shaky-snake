@@ -1,35 +1,37 @@
 package main
 
 import (
-	"log"
+	"fmt"
 	"net/http"
 
-  "github.com/battlesnakeio/starter-snake-go/api"
+	"github.com/brendonion/shaky-snake/api"
 )
 
 func Start(res http.ResponseWriter, req *http.Request) {
-	decoded := api.SnakeRequest{}
-	err := api.DecodeSnakeRequest(req, &decoded)
-	if err != nil {
-		log.Printf("Bad start request: %v", err)
-	}
-	dump(decoded)
-
 	respond(res, api.StartResponse{
-		Color: "#75CEDD",
+		Color:          "orange",
+		Name:           "shaky-snake",
+		Taunt:          "Let's shake n' bake!",
+		HeadType:       api.HEAD_TONGUE,
+		TailType:       api.TAIL_SKINNY,
+		SecondaryColor: "red",
+		HeadURL:        "https://images-na.ssl-images-amazon.com/images/I/91fVmr46sLL._SL1500_.jpg",
 	})
 }
 
 func Move(res http.ResponseWriter, req *http.Request) {
-	decoded := api.SnakeRequest{}
-	err := api.DecodeSnakeRequest(req, &decoded)
+	currentMove := "down"
+	_, err := api.NewMoveRequest(req)
 	if err != nil {
-		log.Printf("Bad move request: %v", err)
+		fmt.Println("ERROR: ", err)
+		respond(res, api.MoveResponse{
+			Move: "up",
+		})
+		return
 	}
-	dump(decoded)
 
 	respond(res, api.MoveResponse{
-		Move: "down",
+		Move: currentMove,
 	})
 }
 
