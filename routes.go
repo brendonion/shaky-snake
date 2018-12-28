@@ -21,7 +21,14 @@ func Start(res http.ResponseWriter, req *http.Request) {
 	dump(decoded)
 
 	respond(res, api.StartResponse{
-		Color: "#75CEDD",
+		Color: "orange",
+		Name: "Shaky Snake",
+		HeadURL: "https://images-na.ssl-images-amazon.com/images/I/91fVmr46sLL._SL1500_.jpg",
+		Taunt: "It's shake n' bakin' time!",
+		HeadType: api.HEAD_TONGUE,
+		TailType: api.TAIL_SKINNY,
+		SecondaryColor: "blue",
+
 	})
 }
 

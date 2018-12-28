@@ -4,11 +4,11 @@ get:
 .PHONY: get
 
 install:
-	go install github.com/battlesnakeio/starter-snake-go
+	go install github.com/brendonion/shaky-snake
 .PHONY: install
 
 run: install
-	starter-snake-go server
+	shaky-snake server
 .PHONY: run
 
 test:
