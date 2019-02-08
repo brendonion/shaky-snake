@@ -30,34 +30,39 @@ func Move(res http.ResponseWriter, req *http.Request) {
 		println("Bad move request: %v", err)
 	}
 
-	// Init current move
+	// Set current move
 	currentMove := apiEntity.Up
 
-	// Init board
+	// Set board
 	manager := game.InitializeBoard(&decoded)
 
-	// Init your snake
+	// Set your snake
 	you := manager.Req.You
 
 	// TODO: Find the closest food coords and a good time to go after that food
-	// Find a path to nearest food if low on health
+
+	// GO TO FOOD
 	if you.Health <= 50 {
+		println("GO TO FOOD")
+		// Find a path to first food if low on health
 		pathToFood, err := manager.FindPath(manager.OurHead, manager.Req.Board.Food[0])
 		if err != nil {
 			println("ERROR - No path to food!")
 		}
-		// Get direction from coords to food
 		currentMove = lib.DirectionFromCoords(pathToFood[0], pathToFood[1])
-		println("GO TO FOOD")
+
+		// GO TO TAIL
 	} else if you.Health < 95 && len(you.Body) > 2 {
+		println("GO TO TAIL")
 		pathToTail, err := manager.FindPath(manager.OurHead, you.Body[len(you.Body)-1])
 		if err != nil {
 			println("ERROR - No path to tail!")
 		}
-		// Get direction from coords to tail
 		currentMove = lib.DirectionFromCoords(pathToTail[0], pathToTail[1])
-		println("GO TO TAIL")
+
+		// GO RIGHT
 	} else if len(you.Body) == 2 && you.Body[0] != you.Body[1] {
+		fmt.Println("GO RIGHT")
 		direction := lib.DirectionFromCoords(you.Body[0], you.Body[1])
 		switch direction {
 		case apiEntity.Up:
@@ -69,10 +74,11 @@ func Move(res http.ResponseWriter, req *http.Request) {
 		case apiEntity.Right:
 			currentMove = apiEntity.Up
 		}
-		fmt.Println("TURN RIGHT")
+
+		// GO RANDOM
 	} else {
-		currentMove = lib.DirectionFromCoords(you.Body[0], manager.GameBoard.GetValidTiles(you.Body[0])[0])
 		fmt.Println("GO RANDOM %v", currentMove)
+		currentMove = lib.DirectionFromCoords(you.Body[0], manager.GameBoard.GetValidTiles(you.Body[0])[0])
 	}
 
 	lib.Respond(res, api.MoveResponse{
