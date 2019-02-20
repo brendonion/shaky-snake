@@ -1,0 +1,26 @@
+{
+	"ImportPath": "github.com/brendonion/shaky-snake",
+	"GoVersion": "go1.11",
+	"GodepVersion": "v80",
+	"Packages": [
+		"./..."
+	],
+	"Deps": [
+		{
+			"ImportPath": "github.com/FreshworksStudio/bs-go-utils/api",
+			"Rev": "94ace4197846a3283600462bf5819bc71f2acc65"
+		},
+		{
+			"ImportPath": "github.com/FreshworksStudio/bs-go-utils/apiEntity",
+			"Rev": "94ace4197846a3283600462bf5819bc71f2acc65"
+		},
+		{
+			"ImportPath": "github.com/FreshworksStudio/bs-go-utils/game",
+			"Rev": "94ace4197846a3283600462bf5819bc71f2acc65"
+		},
+		{
+			"ImportPath": "github.com/FreshworksStudio/bs-go-utils/lib",
+			"Rev": "94ace4197846a3283600462bf5819bc71f2acc65"
+		}
+	]
+}
