@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"net/http"
+	"time"
 
 	"github.com/FreshworksStudio/bs-go-utils/api"
 	"github.com/FreshworksStudio/bs-go-utils/apiEntity"
@@ -15,8 +17,8 @@ func Start(res http.ResponseWriter, req *http.Request) {
 		Color: "orange",
 		// Name:           "shaky-snake",
 		// Taunt:          "Let's shake n' bake!",
-		// HeadType:       api.HEAD_TONGUE,
-		// TailType:       api.TAIL_SKINNY,
+		// HeadType:       apiEntity.HeadTongue,
+		// TailType:       apiEntity.TailSkinny,
 		// SecondaryColor: "red",
 		// HeadURL:        "https://images-na.ssl-images-amazon.com/images/I/91fVmr46sLL._SL1500_.jpg",
 	})
@@ -39,19 +41,24 @@ func Move(res http.ResponseWriter, req *http.Request) {
 	// Set your snake
 	you := manager.Req.You
 
-	// TODO: Find the closest food coords and a good time to go after that food
-
-	// GO TO FOOD
 	if you.Health <= 50 {
 		println("GO TO FOOD")
-		// Find a path to first food if low on health
-		pathToFood, err := manager.FindPath(manager.OurHead, manager.Req.Board.Food[0])
+		// Find closest food
+		closestFood := manager.Req.Board.Food[0]
+		for i, food := range manager.Req.Board.Food {
+			prevDistance := lib.Distance(manager.OurHead, closestFood)
+			currentDistance := lib.Distance(manager.OurHead, food)
+			if prevDistance > currentDistance {
+				closestFood = manager.Req.Board.Food[i]
+			}
+		}
+		// Find a path to closest food
+		pathToFood, err := manager.FindPath(manager.OurHead, closestFood)
 		if err != nil {
 			println("ERROR - No path to food!")
 		}
 		currentMove = lib.DirectionFromCoords(pathToFood[0], pathToFood[1])
 
-		// GO TO TAIL
 	} else if you.Health < 95 && len(you.Body) > 2 {
 		println("GO TO TAIL")
 		pathToTail, err := manager.FindPath(manager.OurHead, you.Body[len(you.Body)-1])
@@ -60,10 +67,9 @@ func Move(res http.ResponseWriter, req *http.Request) {
 		}
 		currentMove = lib.DirectionFromCoords(pathToTail[0], pathToTail[1])
 
-		// GO RIGHT
-	} else if len(you.Body) == 2 && you.Body[0] != you.Body[1] {
+	} else if len(you.Body) == 2 && manager.OurHead != you.Body[1] {
 		fmt.Println("GO RIGHT")
-		direction := lib.DirectionFromCoords(you.Body[0], you.Body[1])
+		direction := lib.DirectionFromCoords(manager.OurHead, you.Body[1])
 		switch direction {
 		case apiEntity.Up:
 			currentMove = apiEntity.Left
@@ -75,11 +81,18 @@ func Move(res http.ResponseWriter, req *http.Request) {
 			currentMove = apiEntity.Up
 		}
 
-		// GO RANDOM
 	} else {
-		fmt.Println("GO RANDOM %v", currentMove)
-		currentMove = lib.DirectionFromCoords(you.Body[0], manager.GameBoard.GetValidTiles(you.Body[0])[0])
+		fmt.Println("GO RANDOM")
+		validTiles := manager.GameBoard.GetValidTiles(manager.OurHead)
+		random := rand.New(rand.NewSource(time.Now().UnixNano()))
+		move := 0
+		if len(validTiles) > 1 {
+			move = random.Intn(len(validTiles) - 1)
+		}
+		currentMove = lib.DirectionFromCoords(manager.OurHead, validTiles[move])
 	}
+
+	fmt.Println("CURRENT MOVE: %v", currentMove)
 
 	lib.Respond(res, api.MoveResponse{
 		Move: currentMove,
