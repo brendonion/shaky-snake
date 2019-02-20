@@ -14,7 +14,7 @@ import (
 
 func Start(res http.ResponseWriter, req *http.Request) {
 	lib.Respond(res, api.StartResponse{
-		Color: "orange",
+		Color: "blue",
 		// Name:           "shaky-snake",
 		// Taunt:          "Let's shake n' bake!",
 		// HeadType:       apiEntity.HeadTongue,
@@ -41,7 +41,14 @@ func Move(res http.ResponseWriter, req *http.Request) {
 	// Set your snake
 	you := manager.Req.You
 
-	if you.Health <= 50 {
+	// Get average snake length
+	totalLength := 0
+	for _, snake := range manager.Req.Board.Snakes {
+		totalLength += len(snake.Body)
+	}
+	averageLength := totalLength / len(manager.Req.Board.Snakes)
+
+	if len(you.Body) <= averageLength || you.Health <= manager.Req.Board.Width {
 		println("GO TO FOOD")
 		// Find closest food
 		closestFood := manager.Req.Board.Food[0]
@@ -52,7 +59,6 @@ func Move(res http.ResponseWriter, req *http.Request) {
 				closestFood = manager.Req.Board.Food[i]
 			}
 		}
-		// Find a path to closest food
 		pathToFood, err := manager.FindPath(manager.OurHead, closestFood)
 		if err != nil {
 			println("ERROR - No path to food!")
