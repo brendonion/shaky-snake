@@ -48,7 +48,7 @@ func Move(res http.ResponseWriter, req *http.Request) {
 	}
 	averageLength := totalLength / len(manager.Req.Board.Snakes)
 
-	if len(you.Body) <= averageLength || you.Health <= manager.Req.Board.Width {
+	if len(manager.Req.Board.Food) > 0 && (len(you.Body) <= averageLength || you.Health <= manager.Req.Board.Width) {
 		println("GO TO FOOD")
 		// Find closest food
 		closestFood := manager.Req.Board.Food[0]
